@@ -57,7 +57,6 @@ class TestGenGameBoard(unittest.TestCase):
         row = move_data[2]
         col = move_data[3]
         actual_result = GenGameBoard.make_move(test_board, row, col, mark)
-        GenGameBoard.print_board(test_board)
 
         # Compare expected result with actual result.
         self.assertEqual(expected_success, actual_result)
@@ -207,9 +206,16 @@ class TestGenGameBoard(unittest.TestCase):
         actual_result = GenGameBoard.check_for_win(test_board, mark)
         self.assertEqual(expected_result, actual_result)
 
-    def test_no_more_moves(self):
+    @parameterized.expand([
+        ('return True if board is full', 2, [['A', 'B'], ['C'], ['D']], True),
+        ('return False if board is not full', 2, [['A', 'B'], ['C', ' ']], False)
+    ])
+    def test_no_more_moves(self, _test_name, size, marks, expected_result):
         """ Tests that no_more_moves() returns if there is are moves left. """
-        self.skipTest('Test not yet created.')
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+        actual_result = GenGameBoard.no_more_moves(test_board)
+        self.assertEqual(expected_result, actual_result)
 
     def test_make_computer_move(self):
         """ Tests the make_computer_move() function. """

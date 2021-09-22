@@ -154,8 +154,8 @@ class GenGameBoard:
 
     def no_more_moves(self):
         """
-        Determines whether the board is full
-        If full, returns True, and False otherwise
+        Determines whether the board is full.
+        If full, returns True, and False otherwise.
         """
         return (self.marks != ' ').all()
 
