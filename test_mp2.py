@@ -252,13 +252,19 @@ class TestGenGameBoard(unittest.TestCase):
         actual_result = GenGameBoard.is_terminal(test_board)
         self.assertEqual(expected_result, actual_result)
 
-    def test_make_computer_move(self):
-        """ Tests the make_computer_move() function. """
-        self.skipTest('Test not yet created.')
-
-    def test_get_est_utility(self):
+    @parameterized.expand([
+        ('Estimate at -117', [['X', 'O', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']], -117),
+        ('Estimate at -117', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
+        ('Estimate at -117', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
+        ('Estimate at -117', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
+    ])
+    def test_get_est_utility(self, _test_name, marks, expected_result):
         """ Tests the get_est_utility() function. """
-        self.skipTest('Test not yet created.')
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+        actual_result = GenGameBoard.get_est_utility(test_board)
+        self.assertEqual(expected_result, actual_result)
 
     def test_get_utility(self):
         """ Tests the get_utility() function. """
@@ -270,6 +276,10 @@ class TestGenGameBoard(unittest.TestCase):
 
     def test_alpha_beta_search(self):
         """ Tests the alpha_beta_search() function. """
+        self.skipTest('Test not yet created.')
+
+    def test_make_computer_move(self):
+        """ Tests the make_computer_move() function. """
         self.skipTest('Test not yet created.')
 
     def test_max_value(self):
