@@ -213,12 +213,38 @@ class TestGenGameBoard(unittest.TestCase):
         actual_result = GenGameBoard.no_more_moves(test_board)
         self.assertEqual(expected_result, actual_result)
 
+    @parameterized.expand([
+        (
+            'return True for win by X (row)',
+            [['O', 'O', 'X'], ['X', 'X', 'X'], ['O', ' ', ' ']],
+            True
+        ),
+        (
+            'return True for win by O (col)',
+            [['O', 'O', 'X'], ['O', 'X', 'X'], ['O', 'X', ' ']],
+            True
+        ),
+        (
+            'return True for no more moves',
+            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+            True
+        ),
+        (
+            'return False when there is an empty space and no winner',
+            [['A', 'B', 'C'], ['D', ' ', 'F'], ['G', 'H', 'I']],
+            False
+        ),
+    ])
+    def test_is_terminal(self, _test_name, marks, expected_result):
+        """ Tests the is_terminal() function. """
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+        actual_result = GenGameBoard.is_terminal(test_board)
+        self.assertEqual(expected_result, actual_result)
+
     def test_make_computer_move(self):
         """ Tests the make_computer_move() function. """
-        self.skipTest('Test not yet created.')
-
-    def test_is_terminal(self):
-        """ Tests the is_terminal() function. """
         self.skipTest('Test not yet created.')
 
     def test_get_est_utility(self):
