@@ -1,9 +1,8 @@
 """ The unit tests for the GenGameBoard class. """
 import unittest
 
-
 from parameterized import parameterized
-# import numpy.testing
+import numpy.testing
 import numpy as np
 
 from mp2 import GenGameBoard
@@ -16,9 +15,59 @@ class TestGenGameBoard(unittest.TestCase):
         """ Tests that print_board() prints the game board with current marks. """
         self.skipTest('Test not yet created.')
 
-    def test_make_move(self):
+    @parameterized.expand([
+        (
+                "can place 'X' in empty field 1,1",
+                [2, 'X', 1, 1],
+                [[' ', ' '], [' ', ' ']],
+                True,
+                [['X', ' '], [' ', ' ']],
+        ),
+        (
+                "can place 'X' in empty field 2,2",
+                [3, 'X', 2, 2],
+                [['O', 'O', 'O'], ['O', ' ', 'O'], ['O', 'O', 'O']],
+                True,
+                [['O', 'O', 'O'], ['O', 'X', 'O'], ['O', 'O', 'O']],
+        ),
+        (
+                "cannot place 'X' in occupied field 3,1",
+                [3, 'X', 3, 1],
+                [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
+                False,
+                [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
+        ),
+        (
+                "cannot place 'O' in occupied field 3,1",
+                [3, 'O', 3, 1],
+                [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+                False,
+                [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+        )
+    ])
+    def test_make_move(self, _test_name, move_data, marks, expected_success, desired_marks):
         """ Tests that make_move() attempts to make a move. """
-        self.skipTest('Test not yet created.')
+        # Set up board.
+        size = move_data[0]
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+
+        # Attempt to make the move.
+        mark = move_data[1]
+        row = move_data[2]
+        col = move_data[3]
+        actual_result = GenGameBoard.make_move(test_board, row, col, mark)
+        GenGameBoard.print_board(test_board)
+
+        # Compare expected result with actual result.
+        self.assertEqual(expected_success, actual_result)
+
+        # Compare expected board marks with actual board marks after move.
+        actual_marks = test_board.marks
+        numpy.testing.assert_equal(actual_marks, desired_marks)
+
+        # TODO: Check to see if we print a message when we cannot move and the mark is 'X'
+        # Print message if mark is 'X' and if a move cannot be made.
 
     @parameterized.expand([
         (
@@ -34,7 +83,7 @@ class TestGenGameBoard(unittest.TestCase):
                 [[' ', ' ', ' '], ['X', 'X', 'X'], [' ', ' ', ' ']],
                 'X',
                 True
-         ),
+        ),
         (
                 "should have winning row",
                 3,

@@ -72,8 +72,8 @@ class GenGameBoard:
 
     def make_move(self, row, col, mark):
         """
-        Attempts to make a move given the row,col and mark
-        If move cannot be made, returns False and prints a message if mark is 'X'
+        Attempts to make a move given the row, col, and mark.
+        If move cannot be made, returns False and prints a message if mark is 'X' (player).
         Otherwise, returns True
         """
         possible = False  # Variable to hold the return value
