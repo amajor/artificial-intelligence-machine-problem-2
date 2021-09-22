@@ -242,7 +242,7 @@ class TestGenGameBoard(unittest.TestCase):
             'return False when there is an empty space and no winner',
             [['A', 'B', 'C'], ['D', ' ', 'F'], ['G', 'H', 'I']],
             False
-        ),
+        )
     ])
     def test_is_terminal(self, _test_name, marks, expected_result):
         """ Tests the is_terminal() function. """
@@ -254,9 +254,9 @@ class TestGenGameBoard(unittest.TestCase):
 
     @parameterized.expand([
         ('Estimate at -117', [['X', 'O', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']], -117),
-        ('Estimate at -117', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
-        ('Estimate at -117', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
-        ('Estimate at -117', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
+        ('Estimate at -27', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
+        ('Estimate at 36', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
+        ('Estimate at -36', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
     ])
     def test_get_est_utility(self, _test_name, marks, expected_result):
         """ Tests the get_est_utility() function. """
@@ -266,9 +266,44 @@ class TestGenGameBoard(unittest.TestCase):
         actual_result = GenGameBoard.get_est_utility(test_board)
         self.assertEqual(expected_result, actual_result)
 
-    def test_get_utility(self):
+    @parameterized.expand([
+        # ('Estimate at -117', [['X', 'O', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']], -117),
+        # ('Estimate at -27', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
+        # ('Estimate at 36', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
+        # ('Estimate at -36', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
+        (
+            'Get utility for terminal state, winning X (row)',
+            [['X', 'X', 'X'], [' O', ' ', 'O'], [' ', 'O', ' ']],
+            -1000
+        ),
+        (
+            'Get utility for terminal state, winning O (row)',
+            [['X', ' ', 'X'], ['O', 'O', 'O'], [' ', 'X', ' ']],
+            1000
+        ),
+        (
+            'Get utility for terminal state, winning X (col)',
+            [['O', 'X', 'X'], ['  ', 'X', 'O'], ['O', 'X', 'O']],
+            -1000
+        ),
+        (
+            'Get utility for terminal state, winning O (col)',
+            [['X', 'O', 'X'], ['X', 'O', 'O'], [' ', 'O', 'X']],
+            1000
+        ),
+        (
+            'Get utility for terminal state, draw',
+            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+            0
+        )
+    ])
+    def test_get_utility(self, _test_name, marks, expected_result):
         """ Tests the get_utility() function. """
-        self.skipTest('Test not yet created.')
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+        actual_result = GenGameBoard.get_utility(test_board)
+        self.assertEqual(expected_result, actual_result)
 
     def test_get_actions(self):
         """ Tests the get_actions() function. """
