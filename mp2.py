@@ -9,9 +9,9 @@ Full code and test suite available on GitHub:
 https://github.com/amajor/artificial-intelligence-machine-problem-2
 """
 
-# import random
-import math
 import numpy as np
+import random
+import math
 
 
 class GenGameBoard:
@@ -19,8 +19,8 @@ class GenGameBoard:
     Class responsible for representing the game board and game playing methods
     """
     num_pruned = 0  # counts number of pruned branches due to alpha/beta
-    num1 = 0  # counts number of pruned branches due to reaching maximum utility
-    numm1 = 0  # counts number of pruned braches due to reaching minimum utility
+    utility_max = 0  # counts number of pruned branches due to reaching maximum utility
+    utility_min = 0  # counts number of pruned branches due to reaching minimum utility
     MAX_DEPTH = 6  # max depth before applying evaluation function
     depth = 0  # current depth within minimax search
 
@@ -28,13 +28,8 @@ class GenGameBoard:
         """
         Constructor method - initializes each position variable and the board size
         """
-
-        # Holds the size of the board
-        self.board_size = board_size
-
-        # Holds the mark for each position
-        self.marks = np.empty((board_size, board_size), dtype='str')
-
+        self.board_size = board_size  # Holds the size of the board
+        self.marks = np.empty((board_size, board_size), dtype='str')  # Holds the mark for each position
         self.marks[:, :] = ' '
 
     def print_board(self):
@@ -46,7 +41,7 @@ class GenGameBoard:
         for j in range(self.board_size):
             print(" " + str(j + 1), end='')
 
-        # Prints the rows with marks
+        # Print the rows with marks
         print("")
         for i in range(self.board_size):
             # Print the line separating the row
@@ -72,28 +67,28 @@ class GenGameBoard:
 
         print("-")
 
-    def make_move(self, to_row, to_col, mark):
+    def make_move(self, row, col, mark):
         """
         Attempts to make a move given the row,col and mark
         If move cannot be made, returns False and prints a message if mark is 'X'
         Otherwise, returns True
         """
         possible = False  # Variable to hold the return value
-        if to_row == -1 and to_col == -1:
+        if row == -1 and col == -1:
             return False
 
         # Change the row,col entries to array indexes
-        to_row = to_row - 1
-        to_col = to_col - 1
+        row = row - 1
+        col = col - 1
 
-        if to_row < 0 or to_row >= self.board_size or to_col < 0 or to_col >= self.board_size:
+        if row < 0 or row >= self.board_size or col < 0 or col >= self.board_size:
             print("Not a valid row or column!")
             return False
 
         # Check row and col, and make sure space is empty
         # If empty, set the position to the mark and change possible to True
-        if self.marks[to_row][to_col] == ' ':
-            self.marks[to_row][to_col] = mark
+        if self.marks[row][col] == ' ':
+            self.marks[row][col] = mark
             possible = True
 
             # Print out the message to the player if the move was not possible
@@ -177,7 +172,10 @@ class GenGameBoard:
         """
         Determines if the current board state is a terminal state
         """
-        return self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O')
+        if self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O'):
+            return True
+        else:
+            return False
 
     def get_est_utility(self):
         """
@@ -243,31 +241,31 @@ class GenGameBoard:
             return 0
 
     def get_actions(self):
-        """Generates a list of possible moves"""
+        """ Generates a list of possible moves. """
         return np.argwhere(self.marks == ' ')
 
-    def best_action(self):
+    def alpha_beta_search(self):
         """
         Go through all possible successor states and generate the max_value
         return action (row,col) that gives the max
         uses the backtracking method
         """
         GenGameBoard.depth = 0
-        best_action = self.max_value(-math.inf, math.inf)
-        # print('Depth:', GenGameBoard.depth)
+        utility_value, best_action = self.max_value(-math.inf, math.inf)
+        # print('Depth:',GenGameBoard.depth)
         return best_action
 
-    def min_val(self, alpha, beta):
+    def max_value(self, alpha, beta):
         """
         Finds the action that gives highest minimax value for computer
         Returns both best action and the resulting value
         """
-        # print('Depth:', GenGameBoard.depth)
+        # print('Depth:',GenGameBoard.depth)
         if self.is_terminal():
             return self.get_utility(), np.array([-1, -1])
         if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
             return self.get_est_utility(), np.array([-1, -1])
-        value = -math.inf
+        utility_value = -math.inf
         for action in self.get_actions():
             GenGameBoard.depth = GenGameBoard.depth + 1
             # current_marks = np.array(self.marks) # save current state, so it can be backtracked
@@ -275,21 +273,23 @@ class GenGameBoard:
             self.marks[action[0]][action[1]] = 'O'
             min_val = self.min_value(alpha, beta)
             GenGameBoard.depth = GenGameBoard.depth - 1
-            if min_val > value:
-                value = min_val
+            if min_val > utility_value:
+                utility_value = min_val
                 best_action = action
-            # v = max(v, self.min_value(alpha, beta))
+            # utility_value = max(v, self.min_value(alpha, beta))
             # self.marks = current_marks # backtrack to prior state
             self.marks[action[0]][action[1]] = ' '
 
-            if value >= 10 ** self.board_size:
-                GenGameBoard.num1 = GenGameBoard.num1 + 1
-                return value, best_action
-            if value >= beta:
+            if utility_value >= 10 ** self.board_size:
+                GenGameBoard.utility_max = GenGameBoard.utility_max + 1
+                return utility_value, best_action
+            if utility_value >= beta:
                 GenGameBoard.num_pruned = GenGameBoard.num_pruned + 1
-                return value, best_action
-            alpha = max(alpha, value)
-        return value, best_action
+                return utility_value, best_action
+
+            # Set the MAX utility value (alpha)
+            alpha = max(alpha, utility_value)
+        return utility_value, best_action
 
     def min_value(self, alpha, beta):
         """
@@ -301,38 +301,31 @@ class GenGameBoard:
             return self.get_utility()
         if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
             return self.get_est_utility()
-        value = math.inf
+        utility_value = math.inf
         for action in self.get_actions():
             GenGameBoard.depth = GenGameBoard.depth + 1
             # current_marks = np.array(self.marks) # save current state, so it can be backtracked
             # self.makeMove(action[0]+1, action[1]+1, 'X')
             self.marks[action[0]][action[1]] = 'X'
-            value = min(value, self.max_value(alpha, beta)[0])
+            utility_value = min(utility_value, self.max_value(alpha, beta)[0])
             # self.marks = current_marks # backtrack to prior state
             # self.makeMove(action[0]+1, action[1]+1, ' ')
             self.marks[action[0]][action[1]] = ' '
             GenGameBoard.depth = GenGameBoard.depth - 1
-            if value <= -(10 ** self.board_size):
-                GenGameBoard.numm1 = GenGameBoard.numm1 + 1
-                return value
-            if value <= alpha:
+            if utility_value <= -(10 ** self.board_size):
+                GenGameBoard.utility_min = GenGameBoard.utility_min + 1
+                return utility_value
+            if utility_value <= alpha:
                 GenGameBoard.num_pruned = GenGameBoard.num_pruned + 1
-                return value
-            beta = min(beta, value)
-        return value
+                return utility_value
 
-    def alpha_beta_search(self):
-        """ TODO: Define what this is and returns. """
-        return [True, False]
-
-    def max_value(self, alpha, beta):
-        """ TODO: Define what this is and returns. """
-        pass
+            # Set the MIN utility value (beta)
+            beta = min(beta, utility_value)
+        return utility_value
 
 
 def main():
-    """ Runs the main program. """
-
+    # Print out the header info
     print('Artificial Intelligence')
     print('MP2: Alpha/Beta Search for Generalized Tic-Tac-Toe')
     print('SEMESTER: FALL 2021, TERM 1')
@@ -403,3 +396,7 @@ def main():
         print("You Lost!")
     else:
         print("It was a draw!")
+
+
+if __name__ == "__main__":
+    main()
