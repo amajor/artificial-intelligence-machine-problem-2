@@ -305,9 +305,25 @@ class TestGenGameBoard(unittest.TestCase):
         actual_result = GenGameBoard.get_utility(test_board)
         self.assertEqual(expected_result, actual_result)
 
-    def test_get_actions(self):
+    @parameterized.expand([
+        (
+            'Test bottom row actions',
+            [['X', 'O', 'X'], ['O', 'X', 'O'], [' ', ' ', ' ']],
+            [[2, 0], [2, 1], [2, 2]]
+        ),
+        (
+                'Test diagonal  actions',
+                [['X', 'O', ' '], ['O', ' ', 'O'], [' ', 'X', 'X']],
+                [[0, 2], [1, 1], [2, 0]]
+        )  # pylint: disable=no-self-use
+    ])
+    def test_get_actions(self, _test_name, marks, desired_marks):
         """ Tests the get_actions() function. """
-        self.skipTest('Test not yet created.')
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+        actual_marks = GenGameBoard.get_actions(test_board)
+        numpy.testing.assert_equal(actual_marks, desired_marks)
 
     def test_alpha_beta_search(self):
         """ Tests the alpha_beta_search() function. """
