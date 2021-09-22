@@ -8,37 +8,46 @@ import numpy as np
 from mp2 import GenGameBoard
 
 
+# We can do pruning and stop searching branches when we know the MIN state is already
+# matching the MAX state... hard to explain. But this is the alpha-beta pruning.
+# Read the chapter for better understanding.
+
+# v --> utility_value
+# alpha --> max utility value
+# beta --> min utility value
+# check for possible pruning in the minValue() and maxValue() functiosn
+
 class TestGenGameBoard(unittest.TestCase):
     """ Will run tests against modules and functions in the GenGameBoard class. """
 
     @parameterized.expand([
         (
-                "can place 'X' in empty field 1,1",
-                [2, 'X', 1, 1],
-                [[' ', ' '], [' ', ' ']],
-                True,
-                [['X', ' '], [' ', ' ']],
+            "can place 'X' in empty field 1,1",
+            [2, 'X', 1, 1],
+            [[' ', ' '], [' ', ' ']],
+            True,
+            [['X', ' '], [' ', ' ']],
         ),
         (
-                "can place 'X' in empty field 2,2",
-                [3, 'X', 2, 2],
-                [['O', 'O', 'O'], ['O', ' ', 'O'], ['O', 'O', 'O']],
-                True,
-                [['O', 'O', 'O'], ['O', 'X', 'O'], ['O', 'O', 'O']],
+            "can place 'X' in empty field 2,2",
+            [3, 'X', 2, 2],
+            [['O', 'O', 'O'], ['O', ' ', 'O'], ['O', 'O', 'O']],
+            True,
+            [['O', 'O', 'O'], ['O', 'X', 'O'], ['O', 'O', 'O']],
         ),
         (
-                "cannot place 'X' in occupied field 3,1",
-                [3, 'X', 3, 1],
-                [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
-                False,
-                [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
+            "cannot place 'X' in occupied field 3,1",
+            [3, 'X', 3, 1],
+            [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
+            False,
+            [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
         ),
         (
-                "cannot place 'O' in occupied field 3,1",
-                [3, 'O', 3, 1],
-                [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
-                False,
-                [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+            "cannot place 'O' in occupied field 3,1",
+            [3, 'O', 3, 1],
+            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+            False,
+            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
         )
     ])
     def test_make_move(self, _test_name, move_data, marks, expected_success, desired_marks):
@@ -66,39 +75,39 @@ class TestGenGameBoard(unittest.TestCase):
 
     @parameterized.expand([
         (
-                "should have winning row",
-                3,
-                [['X', 'X', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']],
-                'X',
-                True
+            "should have winning row",
+            3,
+            [['X', 'X', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']],
+            'X',
+            True
         ),
         (
-                "should have winning row",
-                3,
-                [[' ', ' ', ' '], ['X', 'X', 'X'], [' ', ' ', ' ']],
-                'X',
-                True
+            "should have winning row",
+            3,
+            [[' ', ' ', ' '], ['X', 'X', 'X'], [' ', ' ', ' ']],
+            'X',
+            True
         ),
         (
-                "should have winning row",
-                3,
-                [[' ', ' ', ' '], [' ', ' ', ' '], ['X', 'X', 'X']],
-                'X',
-                True
+            "should have winning row",
+            3,
+            [[' ', ' ', ' '], [' ', ' ', ' '], ['X', 'X', 'X']],
+            'X',
+            True
         ),
         (
-                "should not have winning row",
-                3,
-                [['X', 'X', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']],
-                'O',
-                False
+            "should not have winning row",
+            3,
+            [['X', 'X', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']],
+            'O',
+            False
         ),
         (
-                "should not have winning row",
-                2,
-                [['A', ' '], [' ', 'B']],
-                'O',
-                False
+            "should not have winning row",
+            2,
+            [['A', ' '], [' ', 'B']],
+            'O',
+            False
         )
     ])
     def test_check_for_win_rows(self, _test_name, board_size, board_marks, mark, expected_result):
@@ -110,39 +119,39 @@ class TestGenGameBoard(unittest.TestCase):
 
     @parameterized.expand([
         (
-                "should have winning column",
-                3,
-                [['X', ' ', ' '], ['X', ' ', ' '], ['X', ' ', ' ']],
-                'X',
-                True
+            "should have winning column",
+            3,
+            [['X', ' ', ' '], ['X', ' ', ' '], ['X', ' ', ' ']],
+            'X',
+            True
         ),
         (
-                "should have winning column",
-                3,
-                [[' ', 'X', ' '], [' ', 'X', ' '], [' ', 'X', ' ']],
-                'X',
-                True
+            "should have winning column",
+            3,
+            [[' ', 'X', ' '], [' ', 'X', ' '], [' ', 'X', ' ']],
+            'X',
+            True
         ),
         (
-                "should have winning column",
-                3,
-                [[' ', ' ', 'X'], [' ', ' ', 'X'], [' ', ' ', 'X']],
-                'X',
-                True
+            "should have winning column",
+            3,
+            [[' ', ' ', 'X'], [' ', ' ', 'X'], [' ', ' ', 'X']],
+            'X',
+            True
         ),
         (
-                "should not have winning column",
-                3,
-                [['X', 'B', 'C'], ['X', 'B', ' '], ['X', 'B', ' ']],
-                'O',
-                False
+            "should not have winning column",
+            3,
+            [['X', 'B', 'C'], ['X', 'B', ' '], ['X', 'B', ' ']],
+            'O',
+            False
         ),
         (
-                "should not have winning column",
-                2,
-                [['A', ' '], [' ', 'B']],
-                'O',
-                False
+            "should not have winning column",
+            2,
+            [['A', ' '], [' ', 'B']],
+            'O',
+            False
         )
     ])
     def test_check_for_win_columns(self, _test_name, size, marks, mark, expected_result):
@@ -154,45 +163,45 @@ class TestGenGameBoard(unittest.TestCase):
 
     @parameterized.expand([
         (
-                "should have winning diagonal",
-                3,
-                [['X', ' ', ' '], [' ', 'X', ' '], [' ', ' ', 'X']],
-                'X',
-                True
+            "should have winning diagonal",
+            3,
+            [['X', ' ', ' '], [' ', 'X', ' '], [' ', ' ', 'X']],
+            'X',
+            True
         ),
         (
-                "should have winning diagonal",
-                3,
-                [[' ', ' ', 'X'], [' ', 'X', ' '], ['X', ' ', ' ']],
-                'X',
-                True
+            "should have winning diagonal",
+            3,
+            [[' ', ' ', 'X'], [' ', 'X', ' '], ['X', ' ', ' ']],
+            'X',
+            True
         ),
         (
-                "should have winning diagonal",
-                5,
-                [
-                    ['X', ' ', ' ', ' ', ' '],
-                    [' ', 'X', ' ', ' ', ' '],
-                    [' ', ' ', 'X', ' ', ' '],
-                    [' ', ' ', ' ', 'X', ' '],
-                    [' ', ' ', ' ', ' ', 'X']
-                ],
-                'X',
-                True
+            "should have winning diagonal",
+            5,
+            [
+                ['X', ' ', ' ', ' ', ' '],
+                [' ', 'X', ' ', ' ', ' '],
+                [' ', ' ', 'X', ' ', ' '],
+                [' ', ' ', ' ', 'X', ' '],
+                [' ', ' ', ' ', ' ', 'X']
+            ],
+            'X',
+            True
         ),
         (
-                "should not have winning diagonal",
-                3,
-                [['X', 'B', 'C'], ['X', 'B', ' '], ['X', 'B', ' ']],
-                'O',
-                False
+            "should not have winning diagonal",
+            3,
+            [['X', 'B', 'C'], ['X', 'B', ' '], ['X', 'B', ' ']],
+            'O',
+            False
         ),
         (
-                "should not have winning diagonal",
-                2,
-                [['A', ' '], [' ', 'B']],
-                'O',
-                False
+            "should not have winning diagonal",
+            2,
+            [['A', ' '], [' ', 'B']],
+            'O',
+            False
         )
     ])
     def test_check_for_win_diagonals(self, _test_name, size, marks, mark, expected_result):
