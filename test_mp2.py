@@ -11,10 +11,6 @@ from mp2 import GenGameBoard
 class TestGenGameBoard(unittest.TestCase):
     """ Will run tests against modules and functions in the GenGameBoard class. """
 
-    def test_print_board(self):
-        """ Tests that print_board() prints the game board with current marks. """
-        self.skipTest('Test not yet created.')
-
     @parameterized.expand([
         (
                 "can place 'X' in empty field 1,1",
@@ -247,6 +243,10 @@ class TestGenGameBoard(unittest.TestCase):
 
     def test_min_value(self):
         """ Tests the min_value() function. """
+        self.skipTest('Test not yet created.')
+
+    def test_print_board(self):
+        """ Tests that print_board() prints the game board with current marks. """
         self.skipTest('Test not yet created.')
 
 
