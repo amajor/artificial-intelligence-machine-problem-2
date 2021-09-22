@@ -9,9 +9,9 @@ Full code and test suite available on GitHub:
 https://github.com/amajor/artificial-intelligence-machine-problem-2
 """
 
-import numpy as np
 import random
 import math
+import numpy as np
 
 
 class GenGameBoard:
@@ -28,8 +28,11 @@ class GenGameBoard:
         """
         Constructor method - initializes each position variable and the board size
         """
-        self.board_size = board_size  # Holds the size of the board
-        self.marks = np.empty((board_size, board_size), dtype='str')  # Holds the mark for each position
+        # Holds the size of the board
+        self.board_size = board_size
+
+        # Holds the mark for each position
+        self.marks = np.empty((board_size, board_size), dtype='str')
         self.marks[:, :] = ' '
 
     def print_board(self):
@@ -99,14 +102,18 @@ class GenGameBoard:
 
     def check_for_win(self, mark):
         """
-        Determines whether a game winning condition exists
-        If so, returns True, and False otherwise
+        Determines whether a game winning condition exists.
+        If so, returns True, and False otherwise.
         """
         won = False  # Variable holding the return value
 
-        # Check wins by examining each combination of positions
+        # Check wins by examining each combination of positions, where N is the board size.
+        #   1. Check each row for N matching values.
+        #   2. Check each column for N matching values.
+        #   3. Check the first diagonal for N matching values.
+        #   4. Check the second diagonal for N matching values.
 
-        # Check each row
+        # Check each row.
         for i in range(self.board_size):
             won = True
             for j in range(self.board_size):
@@ -116,7 +123,7 @@ class GenGameBoard:
             if won:
                 break
 
-        # Check each column
+        # Check each column.
         if not won:
             for i in range(self.board_size):
                 won = True
@@ -127,7 +134,7 @@ class GenGameBoard:
                 if won:
                     break
 
-        # Check first diagonal
+        # Check first diagonal.
         if not won:
             for i in range(self.board_size):
                 won = True
@@ -135,7 +142,7 @@ class GenGameBoard:
                     won = False
                     break
 
-        # Check second diagonal
+        # Check second diagonal.
         if not won:
             for i in range(self.board_size):
                 won = True
@@ -172,10 +179,7 @@ class GenGameBoard:
         """
         Determines if the current board state is a terminal state
         """
-        if self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O'):
-            return True
-        else:
-            return False
+        return self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O')
 
     def get_est_utility(self):
         """
@@ -325,6 +329,8 @@ class GenGameBoard:
 
 
 def main():
+    """ Runs the main program for the game. """
+
     # Print out the header info
     print('Artificial Intelligence')
     print('MP2: Alpha/Beta Search for Generalized Tic-Tac-Toe')
