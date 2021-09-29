@@ -13,26 +13,14 @@ import math
 import numpy as np
 
 
-def print_current_depth(debugging_on):
-    """
-    Strictly for debugging purposes
-    """
-    depth = GenGameBoard.depth
-    if debugging_on:
-        print(' ' * depth, '---> Depth:', depth)
-
-
 class GenGameBoard:
     """
     Class responsible for representing the game board and game playing methods
     """
     num_pruned = 0  # counts number of pruned branches due to alpha/beta
-    utility_max = 0  # counts number of pruned branches due to reaching maximum utility
-    utility_min = 0  # counts number of pruned branches due to reaching minimum utility
-    MAX_DEPTH = 6  # max depth before applying evaluation function
     depth = 0  # current depth within minimax search
 
-    DEBUGGING_ON = False  # Whether we should print debugging information
+    DEBUGGING_ON = True  # Whether we should print debugging information
 
     def __init__(self, board_size):
         """
@@ -44,6 +32,15 @@ class GenGameBoard:
         # Holds the mark for each position
         self.marks = np.empty((board_size, board_size), dtype='str')
         self.marks[:, :] = ' '
+
+    def print_current_depth(self):
+        """
+        Strictly for debugging purposes
+        """
+        depth = self.depth
+        pruned = self.num_pruned
+        if self.DEBUGGING_ON:
+            print(' ' * depth, '---> Depth:', depth, '( pruned', pruned, ')')
 
     def print_board(self):
         """
@@ -213,7 +210,7 @@ class GenGameBoard:
         """
         GenGameBoard.depth = 0
         utility_value, best_action = self.max_value(-math.inf, math.inf)  # pylint: disable=unused-variable
-        print_current_depth(GenGameBoard.DEBUGGING_ON)
+        self.print_current_depth()
         return best_action
 
     def max_value(self, alpha, beta):
@@ -221,7 +218,7 @@ class GenGameBoard:
         Finds the action that gives highest minimax value for computer
         Returns both best action and the resulting value
         """
-        print_current_depth(GenGameBoard.DEBUGGING_ON)
+        self.print_current_depth()
 
         # Check if we're at the end of our options.
         if self.is_terminal():
@@ -235,14 +232,7 @@ class GenGameBoard:
             # Move one level deeper.
             GenGameBoard.depth = GenGameBoard.depth + 1
 
-            # Store current state so we can backtrack.
-            current_marks = np.array(self.marks)
-
-            # Attempt to make move for COMPUTER.
-            # Translate array index to row/col #'s.
-            #     row = action[0] + 1
-            #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, 'O')
+            # Place 'O' on board for COMPUTER.
             self.marks[action[0]][action[1]] = 'O'
 
             # Calculate minimum utility value based on the move.
@@ -260,7 +250,6 @@ class GenGameBoard:
             utility_value = max(utility_value, self.min_value(alpha, beta))
 
             # Backtrack to prior state.
-            self.marks = current_marks
             self.marks[action[0]][action[1]] = ' '
 
             if utility_value >= beta:
@@ -275,7 +264,7 @@ class GenGameBoard:
         Finds the action that gives lowest minimax value for computer
         Returns the resulting value
         """
-        print_current_depth(GenGameBoard.DEBUGGING_ON)
+        self.print_current_depth()
 
         # Check if we're at the end of our options.
         if self.is_terminal():
@@ -289,22 +278,13 @@ class GenGameBoard:
             # Move one level deeper.
             GenGameBoard.depth = GenGameBoard.depth + 1
 
-            # Store current state so we can backtrack.
-            current_marks = np.array(self.marks)
-
-            # Attempt to make move for PLAYER.
-            # Translate array index to row/col #'s.
-            #     row = action[0] + 1
-            #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, 'X')
+            # Place 'X' on board for PLAYER.
             self.marks[action[0]][action[1]] = 'X'
 
             # Calculate minimum utility value based on that move.
             min_utility_value = min(min_utility_value, self.max_value(alpha, beta)[0])
 
             # Backtrack to prior state.
-            self.marks = current_marks
-            self.make_move(action[0] + 1, action[1] + 1, ' ')
             self.marks[action[0]][action[1]] = ' '
 
             # Move one level shallower.
