@@ -328,8 +328,6 @@ class GenGameBoard:
         Finds the action that gives lowest minimax value for computer
         Returns the resulting value
         """
-        print('\nalpha: ', alpha)
-        print('beta: ', beta)
         print_current_depth(GenGameBoard.DEBUGGING_ON)
         if self.is_terminal():
             return self.get_utility()
