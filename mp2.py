@@ -111,6 +111,7 @@ class GenGameBoard:
         return possible
 
     def check_for_win(self, mark):
+        # pylint: disable=too-many-branches
         """
         Determines whether a game winning condition exists.
         If so, returns True, and False otherwise.
@@ -188,6 +189,7 @@ class GenGameBoard:
         return self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O')
 
     def get_est_utility(self):
+        # pylint: disable=too-many-branches
         """
         Implements an evaluation function to estimate the utility of current state
         """
@@ -245,10 +247,9 @@ class GenGameBoard:
         assert self.is_terminal()
         if self.check_for_win('X'):
             return -10 ** self.board_size
-        elif self.check_for_win('O'):
+        if self.check_for_win('O'):
             return 10 ** self.board_size
-        else:
-            return 0
+        return 0
 
     def get_actions(self):
         """ Generates a list of possible moves. """
@@ -261,7 +262,7 @@ class GenGameBoard:
         uses the backtracking method
         """
         GenGameBoard.depth = 0
-        utility_value, best_action = self.max_value(-math.inf, math.inf)
+        utility_value, best_action = self.max_value(-math.inf, math.inf)  # pylint: disable=unused-variable
         print_current_depth(GenGameBoard.DEBUGGING_ON)
         return best_action
 
@@ -421,7 +422,7 @@ def main():
             # Player won
             result = WON
             break
-        elif board.no_more_moves():
+        if board.no_more_moves():
             # No moves left -> draw
             result = DRAW
             break
@@ -438,7 +439,7 @@ def main():
             # Computer won
             result = LOST
             break
-        elif board.no_more_moves():
+        if board.no_more_moves():
             # No moves left -> draw
             result = DRAW
             break
