@@ -190,67 +190,15 @@ class GenGameBoard:
         """
         return self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O')
 
-    def get_est_utility(self):
-        # pylint: disable=too-many-branches
-        """
-        Implements an evaluation function to estimate the utility of current state
-        """
-        assert not self.is_terminal()
-        points = 0
-
-        # Check each row
-        for i in range(self.board_size):
-            num_o_in_row = 0
-            num_x_in_row = 0
-            for j in range(self.board_size):
-                if self.marks[i][j] == 'O':
-                    num_o_in_row = num_o_in_row + 1
-                elif self.marks[i][j] == 'X':
-                    num_x_in_row = num_x_in_row + 1
-            points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
-
-        # Check each column
-        for i in range(self.board_size):
-            num_o_in_row = 0
-            num_x_in_row = 0
-            for j in range(self.board_size):
-                if self.marks[j][i] == 'O':
-                    num_o_in_row = num_o_in_row + 1
-                elif self.marks[j][i] == 'X':
-                    num_x_in_row = num_x_in_row + 1
-            points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
-
-        # Check main diagonal
-        num_o_in_row = 0
-        num_x_in_row = 0
-        for i in range(self.board_size):
-            if self.marks[i][i] == 'O':
-                num_o_in_row = num_o_in_row + 1
-            elif self.marks[i][i] == 'X':
-                num_x_in_row = num_x_in_row + 1
-        points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
-
-        # Check other diagonal
-        num_o_in_row = 0
-        num_x_in_row = 0
-        for i in range(self.board_size):
-            if self.marks[self.board_size - 1 - i][i] == 'O':
-                num_o_in_row = num_o_in_row + 1
-            elif self.marks[self.board_size - 1 - i][i] == 'X':
-                num_x_in_row = num_x_in_row + 1
-        points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
-
-        return points
-
     def get_utility(self):
         """
         Finds the utility of a terminal state
         """
         assert self.is_terminal()
         if self.check_for_win('X'):
-            return -10 ** self.board_size
+            return -1
         if self.check_for_win('O'):
-            return 10 ** self.board_size
+            return 1
         return 0
 
     def get_actions(self):
@@ -274,10 +222,10 @@ class GenGameBoard:
         Returns both best action and the resulting value
         """
         print_current_depth(GenGameBoard.DEBUGGING_ON)
+
+        # Check if we're at the end of our options.
         if self.is_terminal():
             return self.get_utility(), np.array([-1, -1])
-        if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
-            return self.get_est_utility(), np.array([-1, -1])
 
         # Set lowest possible utility_value so we can move up.
         utility_value = -math.inf
@@ -297,15 +245,15 @@ class GenGameBoard:
             self.make_move(action[0] + 1, action[1] + 1, 'O')
             self.marks[action[0]][action[1]] = 'O'
 
-            # Calculate minimum value.
-            min_val = self.min_value(alpha, beta)
+            # Calculate minimum utility value based on the move.
+            min_utility_value = self.min_value(alpha, beta)
 
             # Move one level shallower.
             GenGameBoard.depth = GenGameBoard.depth - 1
 
             # Is the minimum value more desirable (a larger number for MAX)?
-            if min_val > utility_value:
-                utility_value = min_val
+            if min_utility_value > utility_value:
+                utility_value = min_utility_value
                 best_action = action
 
             # Compare the minimum value with the stored maximum value.
@@ -315,9 +263,6 @@ class GenGameBoard:
             self.marks = current_marks
             self.marks[action[0]][action[1]] = ' '
 
-            if utility_value >= 10 ** self.board_size:
-                GenGameBoard.utility_max = GenGameBoard.utility_max + 1
-                return utility_value, best_action
             if utility_value >= beta:
                 GenGameBoard.num_pruned = GenGameBoard.num_pruned + 1
                 return utility_value, best_action
@@ -331,13 +276,13 @@ class GenGameBoard:
         Returns the resulting value
         """
         print_current_depth(GenGameBoard.DEBUGGING_ON)
+
+        # Check if we're at the end of our options.
         if self.is_terminal():
             return self.get_utility()
-        if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
-            return self.get_est_utility()
 
         # Set larges possible utility_value so we can move down.
-        utility_value = math.inf
+        min_utility_value = math.inf
 
         # Loop through available spaces on the board.
         for action in self.get_actions():
@@ -354,8 +299,8 @@ class GenGameBoard:
             self.make_move(action[0] + 1, action[1] + 1, 'X')
             self.marks[action[0]][action[1]] = 'X'
 
-            # Calculate minimum value.
-            utility_value = min(utility_value, self.max_value(alpha, beta)[0])
+            # Calculate minimum utility value based on that move.
+            min_utility_value = min(min_utility_value, self.max_value(alpha, beta)[0])
 
             # Backtrack to prior state.
             self.marks = current_marks
@@ -364,18 +309,16 @@ class GenGameBoard:
 
             # Move one level shallower.
             GenGameBoard.depth = GenGameBoard.depth - 1
-            if utility_value <= -(10 ** self.board_size):
-                GenGameBoard.utility_min = GenGameBoard.utility_min + 1
-                return utility_value
-            if utility_value <= alpha:
+
+            if min_utility_value <= alpha:
                 GenGameBoard.num_pruned = GenGameBoard.num_pruned + 1
-                return utility_value
+                return min_utility_value
 
             # Set the MIN utility value (beta)
-            beta = min(beta, utility_value)
+            beta = min(beta, min_utility_value)
 
         # Return the best utility value.
-        return utility_value
+        return min_utility_value
 
 
 def main():

@@ -262,43 +262,25 @@ class TestGenGameBoard(unittest.TestCase):
         self.assertEqual(expected_result, actual_result)
 
     @parameterized.expand([
-        ('Estimate at -117', [['X', 'O', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']], -117),
-        ('Estimate at -27', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
-        ('Estimate at 36', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
-        ('Estimate at -36', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
-    ])
-    def test_get_est_utility(self, _test_name, marks, expected_result):
-        """ Tests the get_est_utility() function. """
-        size = 3
-        test_board = GenGameBoard(size)
-        test_board.marks = np.copy(marks)
-        actual_result = GenGameBoard.get_est_utility(test_board)
-        self.assertEqual(expected_result, actual_result)
-
-    @parameterized.expand([
-        # ('Estimate at -117', [['X', 'O', 'X'], [' ', ' ', ' '], [' ', ' ', ' ']], -117),
-        # ('Estimate at -27', [['X', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], -27),
-        # ('Estimate at 36', [[' ', ' ', ' '], [' ', 'O', ' '], [' ', ' ', ' ']], 36),
-        # ('Estimate at -36', [[' ', ' ', ' '], [' ', 'X', ' '], [' ', ' ', ' ']], -36)
         (
             'Get utility for terminal state, winning X (row)',
             [['X', 'X', 'X'], [' O', ' ', 'O'], [' ', 'O', ' ']],
-            -1000
+            -1
         ),
         (
             'Get utility for terminal state, winning O (row)',
             [['X', ' ', 'X'], ['O', 'O', 'O'], [' ', 'X', ' ']],
-            1000
+            1
         ),
         (
             'Get utility for terminal state, winning X (col)',
             [['O', 'X', 'X'], ['  ', 'X', 'O'], ['O', 'X', 'O']],
-            -1000
+            -1
         ),
         (
             'Get utility for terminal state, winning O (col)',
             [['X', 'O', 'X'], ['X', 'O', 'O'], [' ', 'O', 'X']],
-            1000
+            1
         ),
         (
             'Get utility for terminal state, draw',
@@ -338,12 +320,12 @@ class TestGenGameBoard(unittest.TestCase):
         (
             'Test 1 for best action for MAX (player O)',
             [['X', 'O', 'X'], [' ', 'O', ' '], [' ', 'X', ' ']],
-            -1000,
+            -1,
             [1, 0]  # Row 2, Col 1 = [1, 0]
         ), (
             'Test 2 for best action for MAX (player O)',
             [['X', 'O', 'X'], ['O', 'O', 'X'], [' ', 'X', ' ']],
-            -1000,
+            -1,
             [2, 0]  # Row 3, Col 1 = [2, 0]
         )  # pylint: disable=no-self-use
     ])
@@ -366,11 +348,11 @@ class TestGenGameBoard(unittest.TestCase):
         (
             'Test 1 for best action for MIN (player X)',
             [['X', 'O', 'X'], ['O', 'O', ' '], [' ', 'X', ' ']],
-            -1000
+            -1
         ), (
             'Test 2 for best action for MIN (player X)',
             [['X', 'O', 'X'], ['O', 'O', 'X'], ['O', 'X', ' ']],
-            -1000
+            -1
         )  # pylint: disable=no-self-use
     ])
     def test_min_value(self, _test_name, marks, expected_utility):
