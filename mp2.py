@@ -162,18 +162,14 @@ class GenGameBoard:
     # TODO - self method should run minimax to determine the value of each move
     # Then make best move for the computer by placing the mark in the best spot
     def make_computer_move(self):
-        """
-        # This code chooses a random computer move
-        # Make sure the move was possible, if not try again
-        row, col = -1, -1
-        while not self.makeMove(row, col, 'O'):
-            col = random.randint(1,boardSize)
-            row = random.randint(1,boardSize)
-        print("Computer chose: "+str(row)+","+str(col))
-        """
+        """ Make the computer move based on best action. """
         # Make AI move
         best_action = self.alpha_beta_search()
-        self.make_move(best_action[0] + 1, best_action[1] + 1, 'O')
+        row = best_action[0] + 1
+        col = best_action[1] + 1
+        # TODO: Only make this move if it's allowed, otherwise pick new action.
+        self.make_move(row, col, 'O')
+        print("Computer chose: " + str(row) + "," + str(col))
 
     def is_terminal(self):
         """
