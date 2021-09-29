@@ -1,4 +1,5 @@
 """ The unit tests for the GenGameBoard class. """
+import math
 import unittest
 
 from parameterized import parameterized
@@ -15,7 +16,7 @@ from mp2 import GenGameBoard
 # v --> utility_value
 # alpha --> max utility value
 # beta --> min utility value
-# check for possible pruning in the minValue() and maxValue() functiosn
+# check for possible pruning in the minValue() and maxValue() functions
 
 class TestGenGameBoard(unittest.TestCase):
     """ Will run tests against modules and functions in the GenGameBoard class. """
@@ -325,20 +326,65 @@ class TestGenGameBoard(unittest.TestCase):
         actual_marks = GenGameBoard.get_actions(test_board)
         numpy.testing.assert_equal(actual_marks, desired_marks)
 
+    @parameterized.expand([
+        (
+            'Test 1 for best action for MAX (player O)',
+            [['X', 'O', 'X'], [' ', 'O', ' '], [' ', 'X', ' ']],
+            -1000,
+            [1, 0]  # Row 2, Col 1 = [1, 0]
+        ), (
+            'Test 2 for best action for MAX (player O)',
+            [['X', 'O', 'X'], ['O', 'O', 'X'], [' ', 'X', ' ']],
+            -1000,
+            [2, 0]  # Row 3, Col 1 = [2, 0]
+        )  # pylint: disable=no-self-use
+    ])
+    def test_max_value(self, _test_name, marks, expected_utility, expected_best):
+        """ Tests the max_value() function. """
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+
+        # Set inputs for the actual result
+        alpha = 0
+        beta = math.inf
+        actual_result = GenGameBoard.max_value(test_board, alpha, beta)
+
+        # Compare the expectation with actual results.
+        self.assertEqual(expected_utility, actual_result[0])
+        numpy.testing.assert_equal(actual_result[1], expected_best)
+
+    @parameterized.expand([
+        (
+            'Test 1 for best action for MIN (player X)',
+            [['X', 'O', 'X'], ['O', 'O', ' '], [' ', 'X', ' ']],
+            -1000
+        ), (
+            'Test 2 for best action for MIN (player X)',
+            [['X', 'O', 'X'], ['O', 'O', 'X'], ['O', 'X', ' ']],
+            -1000
+        )  # pylint: disable=no-self-use
+    ])
+    def test_min_value(self, _test_name, marks, expected_utility):
+        """ Tests the min_value() function. """
+        size = 3
+        test_board = GenGameBoard(size)
+        test_board.marks = np.copy(marks)
+
+        # Set inputs for the actual result
+        alpha = -math.inf
+        beta = math.inf
+        actual_result = GenGameBoard.min_value(test_board, alpha, beta)
+
+        # Compare the expectation with actual results.
+        self.assertEqual(expected_utility, actual_result)
+
     def test_alpha_beta_search(self):
         """ Tests the alpha_beta_search() function. """
         self.skipTest('Test not yet created.')
 
     def test_make_computer_move(self):
         """ Tests the make_computer_move() function. """
-        self.skipTest('Test not yet created.')
-
-    def test_max_value(self):
-        """ Tests the max_value() function. """
-        self.skipTest('Test not yet created.')
-
-    def test_min_value(self):
-        """ Tests the min_value() function. """
         self.skipTest('Test not yet created.')
 
     def test_print_board(self):
