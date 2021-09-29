@@ -9,9 +9,17 @@ Full code and test suite available on GitHub:
 https://github.com/amajor/artificial-intelligence-machine-problem-2
 """
 
-import random
 import math
 import numpy as np
+
+
+def print_current_depth(debugging_on):
+    """
+    Strictly for debugging purposes
+    """
+    depth = GenGameBoard.depth
+    if debugging_on:
+        print(' ' * depth, '---> Depth:', depth)
 
 
 class GenGameBoard:
@@ -23,6 +31,8 @@ class GenGameBoard:
     utility_min = 0  # counts number of pruned branches due to reaching minimum utility
     MAX_DEPTH = 6  # max depth before applying evaluation function
     depth = 0  # current depth within minimax search
+
+    DEBUGGING_ON = False  # Whether we should print debugging information
 
     def __init__(self, board_size):
         """
@@ -94,7 +104,7 @@ class GenGameBoard:
             self.marks[row][col] = mark
             possible = True
 
-            # Print out the message to the player if the move was not possible
+        # Print out the message to the player if the move was not possible
         if not possible and mark == 'X':
             print("\nThis position is already taken!")
 
@@ -252,7 +262,7 @@ class GenGameBoard:
         """
         GenGameBoard.depth = 0
         utility_value, best_action = self.max_value(-math.inf, math.inf)
-        # print('Depth:',GenGameBoard.depth)
+        print_current_depth(GenGameBoard.DEBUGGING_ON)
         return best_action
 
     def max_value(self, alpha, beta):
@@ -260,7 +270,7 @@ class GenGameBoard:
         Finds the action that gives highest minimax value for computer
         Returns both best action and the resulting value
         """
-        # print('Depth:',GenGameBoard.depth)
+        print_current_depth(GenGameBoard.DEBUGGING_ON)
         if self.is_terminal():
             return self.get_utility(), np.array([-1, -1])
         if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
@@ -296,7 +306,7 @@ class GenGameBoard:
         Finds the action that gives lowest minimax value for computer
         Returns the resulting value
         """
-        # print('Depth:',GenGameBoard.depth)
+        print_current_depth(GenGameBoard.DEBUGGING_ON)
         if self.is_terminal():
             return self.get_utility()
         if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
