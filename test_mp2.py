@@ -1,5 +1,7 @@
 """ The unit tests for the GenGameBoard class. """
+import io
 import math
+import sys
 import unittest
 
 from parameterized import parameterized
@@ -27,32 +29,36 @@ class TestGenGameBoard(unittest.TestCase):
             [2, 'X', 1, 1],
             [[' ', ' '], [' ', ' ']],
             True,
-            [['X', ' '], [' ', ' ']],
+            [['X', ' '], [' ', ' ']]
         ),
         (
             "can place 'X' in empty field 2,2",
             [3, 'X', 2, 2],
             [['O', 'O', 'O'], ['O', ' ', 'O'], ['O', 'O', 'O']],
             True,
-            [['O', 'O', 'O'], ['O', 'X', 'O'], ['O', 'O', 'O']],
+            [['O', 'O', 'O'], ['O', 'X', 'O'], ['O', 'O', 'O']]
         ),
         (
             "cannot place 'X' in occupied field 3,1",
             [3, 'X', 3, 1],
             [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
             False,
-            [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],
+            [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']]
         ),
         (
             "cannot place 'O' in occupied field 3,1",
             [3, 'O', 3, 1],
             [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
             False,
-            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+            [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']]
         )
     ])
     def test_make_move(self, _test_name, move_data, marks, expected_success, desired_marks):
         """ Tests that make_move() attempts to make a move. """
+        # Create the path and capture the output.
+        captured_output = io.StringIO()  # Create StringIO object
+        sys.stdout = captured_output  # and redirect stdout.
+
         # Set up board.
         size = move_data[0]
         test_board = GenGameBoard(size)
@@ -71,8 +77,10 @@ class TestGenGameBoard(unittest.TestCase):
         actual_marks = test_board.marks
         numpy.testing.assert_equal(actual_marks, desired_marks)
 
-        # TODO: Check to see if we print a message when we cannot move and the mark is 'X'
         # Print message if mark is 'X' and if a move cannot be made.
+        error_msg = '\nThis position is already taken!\n'
+        expected_message = '' if (expected_success or mark == 'O') else error_msg
+        self.assertIn(expected_message, captured_output.getvalue())
 
     @parameterized.expand([
         (

@@ -170,16 +170,18 @@ class GenGameBoard:
         """
         return (self.marks != ' ').all()
 
-    # TODO - self method should run minimax to determine the value of each move
     # Then make best move for the computer by placing the mark in the best spot
     def make_computer_move(self):
         """ Make the computer move based on best action. """
-        # Make AI move
+        # Calculate the best action for COMPUTER user (O).
         best_action = self.alpha_beta_search()
         row = best_action[0] + 1
         col = best_action[1] + 1
-        # TODO: Only make this move if it's allowed, otherwise pick new action.
+
+        # Make the move based on best action calculated.
         self.make_move(row, col, 'O')
+
+        # Print the move made.
         print("Computer chose: " + str(row) + "," + str(col))
 
     def is_terminal(self):
