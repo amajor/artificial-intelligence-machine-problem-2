@@ -250,7 +250,7 @@ class GenGameBoard:
         """
         Finds the utility of a terminal state
         """
-        assert self.is_terminal()
+        # assert self.is_terminal()
         if self.check_for_win(GenGameBoard.PLAYER):
             return -10 ** self.board_size
         if self.check_for_win(GenGameBoard.COMPUTER):
@@ -286,23 +286,14 @@ class GenGameBoard:
 
         # Loop through available spaces on the board.
         for action in self.get_actions():
-            # Move one level deeper.
+            # Move one level deeper and make a move.
             GenGameBoard.depth = GenGameBoard.depth + 1
-
-            # Store current state so we can backtrack.
-            current_marks = np.array(self.marks)
-
-            # Attempt to make move for COMPUTER.
-            # Translate array index to row/col #'s.
-            #     row = action[0] + 1
-            #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, GenGameBoard.COMPUTER)
-            # self.marks[action[0]][action[1]] = GenGameBoard.COMPUTER
+            self.marks[action[0]][action[1]] = GenGameBoard.COMPUTER
 
             # Calculate minimum value.
             min_val = self.min_value(alpha, beta)
 
-            # Move one level shallower.
+            # Move one level back up.
             GenGameBoard.depth = GenGameBoard.depth - 1
 
             # Is the minimum value more desirable (a larger number for MAX)?
@@ -310,12 +301,8 @@ class GenGameBoard:
                 utility_value = min_val
                 best_action = action
 
-            # Compare the minimum value with the stored maximum value.
-            utility_value = max(utility_value, self.min_value(alpha, beta))
-
-            # Backtrack to prior state.
-            self.marks = current_marks
-            # self.marks[action[0]][action[1]] = ' '
+            # Backtrack to our prior state.
+            self.marks[action[0]][action[1]] = ' '
 
             if utility_value >= 10 ** self.board_size:
                 GenGameBoard.utility_max = GenGameBoard.utility_max + 1
@@ -323,9 +310,10 @@ class GenGameBoard:
             if utility_value >= beta:
                 GenGameBoard.num_pruned = GenGameBoard.num_pruned + 1
                 return utility_value, best_action
+            alpha = max(alpha, utility_value)
 
-            # Return the best utility value and the best action.
-            return utility_value, best_action
+        # Return the best utility value and the best action.
+        return utility_value, best_action
 
     def min_value(self, alpha, beta):
         """
@@ -343,27 +331,15 @@ class GenGameBoard:
         for action in self.get_actions():
             # Move one level deeper.
             GenGameBoard.depth = GenGameBoard.depth + 1
-
-            # Store current state so we can backtrack.
-            current_marks = np.array(self.marks)
-
-            # Attempt to make move for PLAYER.
-            # Translate array index to row/col #'s.
-            #     row = action[0] + 1
-            #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, GenGameBoard.PLAYER)
-            # self.marks[action[0]][action[1]] = GenGameBoard.PLAYER
+            self.marks[action[0]][action[1]] = GenGameBoard.PLAYER
 
             # Calculate minimum value.
             utility_value = min(utility_value, self.max_value(alpha, beta)[0])
 
             # Backtrack to prior state.
-            self.marks = current_marks
-            self.make_move(action[0] + 1, action[1] + 1, ' ')
-            # self.marks[action[0]][action[1]] = ' '
-
-            # Move one level shallower.
+            self.marks[action[0]][action[1]] = ' '
             GenGameBoard.depth = GenGameBoard.depth - 1
+
             if utility_value <= -(10 ** self.board_size):
                 GenGameBoard.utility_min = GenGameBoard.utility_min + 1
                 return utility_value

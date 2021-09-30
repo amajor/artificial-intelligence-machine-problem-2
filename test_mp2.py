@@ -338,13 +338,13 @@ class TestGenGameBoard(unittest.TestCase):
         (
             'Test 1 for best action for MAX (player O)',
             [['X', 'O', 'X'], [' ', 'O', ' '], [' ', 'X', ' ']],
-            -1000,
+            0,
             [1, 0]  # Row 2, Col 1 = [1, 0]
         ), (
             'Test 2 for best action for MAX (player O)',
             [['X', 'O', 'X'], ['O', 'O', 'X'], [' ', 'X', ' ']],
-            -1000,
-            [2, 0]  # Row 3, Col 1 = [2, 0]
+            0,
+            [2, 2]  # Row 3, Col 3 = [2, 0]
         )  # pylint: disable=no-self-use
     ])
     def test_max_value(self, _test_name, marks, expected_utility, expected_best):
@@ -366,7 +366,7 @@ class TestGenGameBoard(unittest.TestCase):
         (
             'Test 1 for best action for MIN (player X)',
             [['X', 'O', 'X'], ['O', 'O', ' '], [' ', 'X', ' ']],
-            -1000
+            0
         ), (
             'Test 2 for best action for MIN (player X)',
             [['X', 'O', 'X'], ['O', 'O', 'X'], ['O', 'X', ' ']],
