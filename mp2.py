@@ -358,7 +358,7 @@ def main():
     """ Runs the main program for the game. """
 
     # Print out the header info
-    print('Artificial Intelligence')
+    print('Artificial Intelligence, Lewis University')
     print('MP2: Alpha/Beta Search for Generalized Tic-Tac-Toe')
     print('SEMESTER: FALL 2021, TERM 1')
     print('NAME: ALISON MAJOR\n')
