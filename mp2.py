@@ -278,10 +278,8 @@ class GenGameBoard:
         Returns both best action and the resulting value
         """
         print_current_depth(GenGameBoard.DEBUGGING_ON)
-        if self.is_terminal():
+        if self.is_terminal() or GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
             return self.get_utility(), np.array([-1, -1])
-        if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
-            return self.get_est_utility(), np.array([-1, -1])
 
         # Set lowest possible utility_value so we can move up.
         utility_value = -math.inf
@@ -335,10 +333,8 @@ class GenGameBoard:
         Returns the resulting value
         """
         print_current_depth(GenGameBoard.DEBUGGING_ON)
-        if self.is_terminal():
+        if self.is_terminal() or GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
             return self.get_utility()
-        if GenGameBoard.depth > GenGameBoard.MAX_DEPTH:
-            return self.get_est_utility()
 
         # Set larges possible utility_value so we can move down.
         utility_value = math.inf
