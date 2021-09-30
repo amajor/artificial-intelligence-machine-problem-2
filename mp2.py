@@ -31,6 +31,8 @@ class GenGameBoard:
     utility_min = 0  # counts number of pruned branches due to reaching minimum utility
     MAX_DEPTH = 6  # max depth before applying evaluation function
     depth = 0  # current depth within minimax search
+    PLAYER = 'X'  # the mark used by the human player
+    COMPUTER = 'O'  # the mark used by the computer
 
     DEBUGGING_ON = False  # Whether we should print debugging information
 
@@ -105,7 +107,7 @@ class GenGameBoard:
             possible = True
 
         # Print out the message to the player if the move was not possible
-        if not possible and mark == 'X':
+        if not possible and mark == GenGameBoard.PLAYER:
             print("\nThis position is already taken!")
 
         return possible
@@ -179,7 +181,7 @@ class GenGameBoard:
         col = best_action[1] + 1
 
         # Make the move based on best action calculated.
-        self.make_move(row, col, 'O')
+        self.make_move(row, col, GenGameBoard.COMPUTER)
 
         # Print the move made.
         print("Computer chose: " + str(row) + "," + str(col))
@@ -188,7 +190,9 @@ class GenGameBoard:
         """
         Determines if the current board state is a terminal state
         """
-        return self.no_more_moves() or self.check_for_win('X') or self.check_for_win('O')
+        x_mark = GenGameBoard.PLAYER
+        o_mark = GenGameBoard.COMPUTER
+        return self.no_more_moves() or self.check_for_win(x_mark) or self.check_for_win(o_mark)
 
     def get_est_utility(self):
         # pylint: disable=too-many-branches
@@ -203,9 +207,9 @@ class GenGameBoard:
             num_o_in_row = 0
             num_x_in_row = 0
             for j in range(self.board_size):
-                if self.marks[i][j] == 'O':
+                if self.marks[i][j] == GenGameBoard.COMPUTER:
                     num_o_in_row = num_o_in_row + 1
-                elif self.marks[i][j] == 'X':
+                elif self.marks[i][j] == GenGameBoard.PLAYER:
                     num_x_in_row = num_x_in_row + 1
             points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
 
@@ -214,9 +218,9 @@ class GenGameBoard:
             num_o_in_row = 0
             num_x_in_row = 0
             for j in range(self.board_size):
-                if self.marks[j][i] == 'O':
+                if self.marks[j][i] == GenGameBoard.COMPUTER:
                     num_o_in_row = num_o_in_row + 1
-                elif self.marks[j][i] == 'X':
+                elif self.marks[j][i] == GenGameBoard.PLAYER:
                     num_x_in_row = num_x_in_row + 1
             points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
 
@@ -224,9 +228,9 @@ class GenGameBoard:
         num_o_in_row = 0
         num_x_in_row = 0
         for i in range(self.board_size):
-            if self.marks[i][i] == 'O':
+            if self.marks[i][i] == GenGameBoard.COMPUTER:
                 num_o_in_row = num_o_in_row + 1
-            elif self.marks[i][i] == 'X':
+            elif self.marks[i][i] == GenGameBoard.PLAYER:
                 num_x_in_row = num_x_in_row + 1
         points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
 
@@ -234,9 +238,9 @@ class GenGameBoard:
         num_o_in_row = 0
         num_x_in_row = 0
         for i in range(self.board_size):
-            if self.marks[self.board_size - 1 - i][i] == 'O':
+            if self.marks[self.board_size - 1 - i][i] == GenGameBoard.COMPUTER:
                 num_o_in_row = num_o_in_row + 1
-            elif self.marks[self.board_size - 1 - i][i] == 'X':
+            elif self.marks[self.board_size - 1 - i][i] == GenGameBoard.PLAYER:
                 num_x_in_row = num_x_in_row + 1
         points = points + 10 ** num_o_in_row - 10 ** num_x_in_row
 
@@ -247,9 +251,9 @@ class GenGameBoard:
         Finds the utility of a terminal state
         """
         assert self.is_terminal()
-        if self.check_for_win('X'):
+        if self.check_for_win(GenGameBoard.PLAYER):
             return -10 ** self.board_size
-        if self.check_for_win('O'):
+        if self.check_for_win(GenGameBoard.COMPUTER):
             return 10 ** self.board_size
         return 0
 
@@ -294,8 +298,8 @@ class GenGameBoard:
             # Translate array index to row/col #'s.
             #     row = action[0] + 1
             #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, 'O')
-            self.marks[action[0]][action[1]] = 'O'
+            self.make_move(action[0] + 1, action[1] + 1, GenGameBoard.COMPUTER)
+            # self.marks[action[0]][action[1]] = GenGameBoard.COMPUTER
 
             # Calculate minimum value.
             min_val = self.min_value(alpha, beta)
@@ -313,7 +317,7 @@ class GenGameBoard:
 
             # Backtrack to prior state.
             self.marks = current_marks
-            self.marks[action[0]][action[1]] = ' '
+            # self.marks[action[0]][action[1]] = ' '
 
             if utility_value >= 10 ** self.board_size:
                 GenGameBoard.utility_max = GenGameBoard.utility_max + 1
@@ -351,8 +355,8 @@ class GenGameBoard:
             # Translate array index to row/col #'s.
             #     row = action[0] + 1
             #     col = action[1] + 1
-            self.make_move(action[0] + 1, action[1] + 1, 'X')
-            self.marks[action[0]][action[1]] = 'X'
+            self.make_move(action[0] + 1, action[1] + 1, GenGameBoard.PLAYER)
+            # self.marks[action[0]][action[1]] = GenGameBoard.PLAYER
 
             # Calculate minimum value.
             utility_value = min(utility_value, self.max_value(alpha, beta)[0])
@@ -360,7 +364,7 @@ class GenGameBoard:
             # Backtrack to prior state.
             self.marks = current_marks
             self.make_move(action[0] + 1, action[1] + 1, ' ')
-            self.marks[action[0]][action[1]] = ' '
+            # self.marks[action[0]][action[1]] = ' '
 
             # Move one level shallower.
             GenGameBoard.depth = GenGameBoard.depth - 1
@@ -407,7 +411,7 @@ def main():
         # Try to make the move and check if it was possible
         # If not possible get col,row inputs from player
         row, col = -1, -1
-        while not board.make_move(row, col, 'X'):
+        while not board.make_move(row, col, GenGameBoard.PLAYER):
             print("Player's Move")
             row, col = input("Choose your move (row, column): ").split(',')
             row = int(row)
@@ -418,7 +422,7 @@ def main():
 
         # Check for ending condition
         # If game is over, check if player won and end the game
-        if board.check_for_win('X'):
+        if board.check_for_win(GenGameBoard.PLAYER):
             # Player won
             result = WON
             break
@@ -435,7 +439,7 @@ def main():
 
         # Check for ending condition
         # If game is over, check if computer won and end the game
-        if board.check_for_win('O'):
+        if board.check_for_win(GenGameBoard.COMPUTER):
             # Computer won
             result = LOST
             break
